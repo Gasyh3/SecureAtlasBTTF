@@ -1,4 +1,3 @@
-import React from 'react';
 import { BookOpen, Users, Clock } from 'lucide-react';
 import type { Course } from '../types/api';
 
@@ -32,7 +31,7 @@ const getLevelText = (level: Course['level']) => {
   }
 };
 
-const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
+const CourseCard = ({ course }: CourseCardProps) => {
   return (
     <div className="card">
       <div className="p-6">
