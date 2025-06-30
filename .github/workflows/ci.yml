@@ -47,11 +47,11 @@ jobs:
     
     - name: Build and test with Docker Compose
       run: |
-        docker-compose build
-        docker-compose up -d
+        docker compose build
+        docker compose up -d
         sleep 30
-        docker-compose ps
-        docker-compose down
+        docker compose ps
+        docker compose down
     
     - name: Build and push frontend image
       uses: docker/build-push-action@v4
