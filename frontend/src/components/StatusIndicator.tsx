@@ -1,4 +1,3 @@
-import React from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
 
 interface StatusIndicatorProps {
@@ -6,7 +5,7 @@ interface StatusIndicatorProps {
   status?: string;
 }
 
-const StatusIndicator: React.FC<StatusIndicatorProps> = ({ isHealthy, status }) => {
+const StatusIndicator = ({ isHealthy, status }: StatusIndicatorProps) => {
   return (
     <div className="flex items-center space-x-2">
       {isHealthy ? (
