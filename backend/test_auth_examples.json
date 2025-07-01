@@ -1,0 +1,155 @@
+{
+  "auth_examples": {
+    "register": {
+      "description": "Inscription d'un nouvel utilisateur",
+      "method": "POST",
+      "url": "http://localhost:8000/auth/register",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "email": "test@example.com",
+        "password": "testpassword123"
+      },
+      "curl_command": "curl -X POST \"http://localhost:8000/auth/register\" -H \"Content-Type: application/json\" -d '{\"email\": \"test@example.com\", \"password\": \"testpassword123\"}'"
+    },
+    "register_instructor": {
+      "description": "Inscription d'un instructeur (sera student par défaut, à modifier manuellement en base)",
+      "method": "POST", 
+      "url": "http://localhost:8000/auth/register",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "email": "instructor@example.com",
+        "password": "instructor123"
+      },
+      "curl_command": "curl -X POST \"http://localhost:8000/auth/register\" -H \"Content-Type: application/json\" -d '{\"email\": \"instructor@example.com\", \"password\": \"instructor123\"}'"
+    },
+    "login": {
+      "description": "Connexion utilisateur (OAuth2 form-data)",
+      "method": "POST",
+      "url": "http://localhost:8000/auth/login",
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "body_form_data": {
+        "username": "test@example.com",
+        "password": "testpassword123"
+      },
+      "curl_command": "curl -X POST \"http://localhost:8000/auth/login\" -H \"Content-Type: application/x-www-form-urlencoded\" -d \"username=test@example.com&password=testpassword123\""
+    },
+    "expected_responses": {
+      "register_success": {
+        "status": 201,
+        "body": {
+          "id": 1,
+          "email": "test@example.com",
+          "role": "student"
+        }
+      },
+      "register_duplicate": {
+        "status": 400,
+        "body": {
+          "detail": "Email already registered"
+        }
+      },
+      "login_success": {
+        "status": 200,
+        "body": {
+          "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+          "token_type": "bearer"
+        }
+      },
+      "login_invalid": {
+        "status": 401,
+        "body": {
+          "detail": "Incorrect email or password"
+        }
+      }
+    }
+  },
+  "test_scenarios": [
+    {
+      "name": "Scénario complet d'authentification",
+      "steps": [
+        {
+          "step": 1,
+          "action": "Inscription",
+          "curl": "curl -X POST \"http://localhost:8000/auth/register\" -H \"Content-Type: application/json\" -d '{\"email\": \"user1@test.com\", \"password\": \"password123\"}'"
+        },
+        {
+          "step": 2,
+          "action": "Connexion",
+          "curl": "curl -X POST \"http://localhost:8000/auth/login\" -H \"Content-Type: application/x-www-form-urlencoded\" -d \"username=user1@test.com&password=password123\""
+        },
+        {
+          "step": 3,
+          "action": "Utilisation du token (exemple)",
+          "curl": "curl -X GET \"http://localhost:8000/api/courses\" -H \"Authorization: Bearer YOUR_TOKEN_HERE\""
+        }
+      ]
+    }
+  ],
+  "postman_collection": {
+    "info": {
+      "name": "E-Learning Auth API",
+      "description": "Collection pour tester l'authentification"
+    },
+    "requests": [
+      {
+        "name": "Register User",
+        "method": "POST",
+        "url": "{{base_url}}/auth/register",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{user_email}}\",\n  \"password\": \"{{user_password}}\"\n}"
+        }
+      },
+      {
+        "name": "Login User", 
+        "method": "POST",
+        "url": "{{base_url}}/auth/login",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "username",
+              "value": "{{user_email}}"
+            },
+            {
+              "key": "password", 
+              "value": "{{user_password}}"
+            }
+          ]
+        }
+      }
+    ],
+    "variables": [
+      {
+        "key": "base_url",
+        "value": "http://localhost:8000"
+      },
+      {
+        "key": "user_email",
+        "value": "test@example.com"
+      },
+      {
+        "key": "user_password",
+        "value": "testpassword123"
+      }
+    ]
+  }
+} 
