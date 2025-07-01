@@ -39,4 +39,20 @@ def get_current_instructor(current_user: User = Depends(get_current_user)):
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not enough permissions"
         )
+    return current_user
+
+def get_current_admin(current_user: User = Depends(get_current_user)):
+    if current_user.role != RoleEnum.admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin permissions required"
+        )
+    return current_user
+
+def get_current_instructor_or_admin(current_user: User = Depends(get_current_user)):
+    if current_user.role not in [RoleEnum.instructor, RoleEnum.admin]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Instructor or admin permissions required"
+        )
     return current_user 

@@ -61,7 +61,7 @@ const LoginPage: React.FC = () => {
             Connexion
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Connectez-vous à votre compte e-learning
+            Connectez-vous à votre compte Kevs Academy
           </p>
         </div>
 

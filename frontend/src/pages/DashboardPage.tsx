@@ -90,7 +90,7 @@ const DashboardPage: React.FC = () => {
             <div className="flex items-center space-x-3">
               <GraduationCap className="w-8 h-8 text-blue-600" />
               <h1 className="text-xl font-bold text-gray-900">
-                E-Learning Platform
+                Kevs Academy
               </h1>
             </div>
             

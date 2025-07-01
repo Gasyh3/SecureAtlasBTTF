@@ -11,6 +11,16 @@ class UserCreate(BaseModel):
     picture_profile: Optional[str] = Field(None, max_length=500, description="URL de la photo de profil")
     password: str = Field(..., min_length=6, description="Mot de passe (minimum 6 caractères)")
 
+class UserCreateAdmin(BaseModel):
+    """Schéma pour créer un utilisateur avec un rôle spécifique (admin uniquement)"""
+    username: Optional[str] = Field(None, max_length=50, description="Nom d'utilisateur unique")
+    email: EmailStr
+    firstname: Optional[str] = Field(None, max_length=100, description="Prénom")
+    lastname: Optional[str] = Field(None, max_length=100, description="Nom de famille")
+    picture_profile: Optional[str] = Field(None, max_length=500, description="URL de la photo de profil")
+    password: str = Field(..., min_length=6, description="Mot de passe (minimum 6 caractères)")
+    role: RoleEnum = Field(..., description="Rôle de l'utilisateur")
+
 class UserUpdate(BaseModel):
     username: Optional[str] = Field(None, max_length=50, description="Nom d'utilisateur unique")
     firstname: Optional[str] = Field(None, max_length=100, description="Prénom")
