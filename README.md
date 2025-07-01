@@ -120,6 +120,3 @@ cd infra
 docker-compose -f docker-compose.dev.yml up
 ```
 
-## 📝 License
-
-MIT License
