@@ -1,6 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
 import uvicorn
+from db import get_db, engine, Base
+from routers import courses
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="E-Learning Platform API",
@@ -17,23 +22,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(courses.router, prefix="/api", tags=["courses"])
+
 @app.get("/")
 async def root():
     return {"message": "Bienvenue sur la plateforme d'e-learning adaptatif"}
 
 @app.get("/health")
-async def health_check():
-    return {"status": "ok"}
-
-@app.get("/api/courses")
-async def get_courses():
-    # Placeholder pour les cours
-    return {
-        "courses": [
-            {"id": 1, "title": "Introduction à Python", "level": "beginner"},
-            {"id": 2, "title": "Développement Web avec FastAPI", "level": "intermediate"}
-        ]
-    }
+async def health_check(db: Session = Depends(get_db)):
+    try:
+        db.execute("SELECT 1")
+        return {"status": "ok", "database": "connected"}
+    except Exception:
+        return {"status": "ok", "database": "disconnected"}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000) 

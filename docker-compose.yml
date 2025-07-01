@@ -23,17 +23,28 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:password@db:5432/elearning
       - PYTHONPATH=/app
+    volumes:
+      - ./backend:/app
+    networks:
+      - app-network
 
   db:
     image: postgres:15-alpine
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=elearning
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
 
 volumes:
-  postgres_data: 
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge 
