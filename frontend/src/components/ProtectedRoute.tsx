@@ -1,13 +1,13 @@
-
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  requiredRoles?: ('student' | 'instructor' | 'admin')[];
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles }) => {
+  const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -22,8 +22,16 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    // Rediriger vers /login avec l'état de la page demandée
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    // Rediriger vers la landing page avec l'état de la page demandée
+    return <Navigate to="/" state={{ from: location, needsAuth: true }} replace />;
+  }
+
+  // Vérifier les rôles requis si spécifiés
+  if (requiredRoles && requiredRoles.length > 0 && user) {
+    if (!requiredRoles.includes(user.role)) {
+      // Rediriger vers le dashboard si l'utilisateur n'a pas le bon rôle
+      return <Navigate to="/dashboard" replace />;
+    }
   }
 
   return <>{children}</>;

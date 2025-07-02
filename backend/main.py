@@ -3,9 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 import uvicorn
 from db import get_db, engine, Base
-from routers import courses, auth
+from routers import courses, auth, modules
 # Import all models so SQLAlchemy can discover them
-from models import User, Course, Lesson, Enrollment
+from models import User, Course, Lesson, Enrollment, CourseModule
 
 Base.metadata.create_all(bind=engine)
 
@@ -26,6 +26,7 @@ app.add_middleware(
 
 app.include_router(courses.router, prefix="/api", tags=["courses"])
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+app.include_router(modules.router, prefix="/api/modules", tags=["modules"])
 
 @app.get("/")
 async def root():

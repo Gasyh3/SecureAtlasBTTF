@@ -5,7 +5,7 @@ export interface User {
   firstname?: string;
   lastname?: string;
   picture_profile?: string;
-  role: 'student' | 'instructor';
+  role: 'student' | 'instructor' | 'admin';
   created_at: string;
   updated_at: string;
 }
@@ -16,7 +16,7 @@ export interface UserPublic {
   firstname?: string;
   lastname?: string;
   picture_profile?: string;
-  role: 'student' | 'instructor';
+  role: 'student' | 'instructor' | 'admin';
 }
 
 export interface LoginRequest {
