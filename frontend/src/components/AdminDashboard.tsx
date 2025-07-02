@@ -47,23 +47,55 @@ const AdminDashboard: React.FC = () => {
         }
 
         if (modulesResponse.status === 'fulfilled') {
-          setModules(modulesResponse.value);
-          
-          // Calculate platform statistics
-          const totalModules = modulesResponse.value.length;
-          const videoModules = modulesResponse.value.filter(m => m.type === 'video').length;
-          const textModules = modulesResponse.value.filter(m => m.type === 'text').length;
-          
-          setPlatformStats({ 
-            totalModules, 
-            videoModules, 
-            textModules,
+          // Vérification de sécurité pour éviter l'erreur undefined.length
+          const modulesData = modulesResponse.value;
+          if (Array.isArray(modulesData)) {
+            setModules(modulesData);
+            
+            // Calculate platform statistics
+            const totalModules = modulesData.length;
+            const videoModules = modulesData.filter(m => m.type === 'video').length;
+            const textModules = modulesData.filter(m => m.type === 'text').length;
+            
+            setPlatformStats({ 
+              totalModules, 
+              videoModules, 
+              textModules,
+              totalUsers: 150, // Mock data
+              activeUsers: 89  // Mock data
+            });
+          } else {
+            setModules([]);
+            setPlatformStats({
+              totalModules: 0,
+              videoModules: 0,
+              textModules: 0,
+              totalUsers: 150, // Mock data
+              activeUsers: 89  // Mock data
+            });
+            console.warn('Modules data is not an array:', modulesData);
+          }
+        } else {
+          setModules([]);
+          setPlatformStats({
+            totalModules: 0,
+            videoModules: 0,
+            textModules: 0,
             totalUsers: 150, // Mock data
             activeUsers: 89  // Mock data
           });
+          console.error('Failed to fetch modules:', modulesResponse.reason);
         }
       } catch (error) {
         console.error('Erreur chargement dashboard:', error);
+        setModules([]); // S'assurer que modules reste un array en cas d'erreur
+        setPlatformStats({
+          totalModules: 0,
+          videoModules: 0,
+          textModules: 0,
+          totalUsers: 150, // Mock data
+          activeUsers: 89  // Mock data
+        });
       } finally {
         setLoading(false);
       }
@@ -73,32 +105,45 @@ const AdminDashboard: React.FC = () => {
   }, []);
 
   const getDisplayName = () => {
-    if (user?.firstname && user?.lastname) {
-      return `${user.firstname} ${user.lastname}`;
+    if (user?.firstname && user?.firstname.trim().length > 0 && user?.lastname && user?.lastname.trim().length > 0) {
+      return `${user.firstname.trim()} ${user.lastname.trim()}`;
     }
-    if (user?.firstname) {
-      return user.firstname;
+    if (user?.firstname && user?.firstname.trim().length > 0) {
+      return user.firstname.trim();
     }
-    if (user?.username) {
-      return user.username;
+    if (user?.username && user?.username.trim().length > 0) {
+      return user.username.trim();
     }
-    return user?.email.split('@')[0] || 'Utilisateur';
+    if (user?.email && user?.email.trim().length > 0) {
+      const emailPart = user.email.trim().split('@')[0];
+      return emailPart && emailPart.length > 0 ? emailPart : 'Utilisateur';
+    }
+    return 'Utilisateur';
   };
 
   const getInitials = () => {
-    if (user?.firstname && user?.lastname) {
-      return `${user.firstname[0]}${user.lastname[0]}`.toUpperCase();
+    if (user?.firstname && user?.firstname.trim().length > 0 && user?.lastname && user?.lastname.trim().length > 0) {
+      return `${user.firstname.trim()[0]}${user.lastname.trim()[0]}`.toUpperCase();
     }
-    if (user?.firstname) {
-      return user.firstname[0].toUpperCase();
+    if (user?.firstname && user?.firstname.trim().length > 0) {
+      return user.firstname.trim()[0].toUpperCase();
     }
-    if (user?.username) {
-      return user.username.slice(0, 2).toUpperCase();
+    if (user?.username && user?.username.trim().length >= 2) {
+      return user.username.trim().slice(0, 2).toUpperCase();
     }
-    return user?.email[0].toUpperCase() || 'U';
+    if (user?.username && user?.username.trim().length > 0) {
+      return user.username.trim()[0].toUpperCase();
+    }
+    if (user?.email && user?.email.trim().length > 0) {
+      return user.email.trim()[0].toUpperCase();
+    }
+    return 'U';
   };
 
   const recentModules = modules.slice(0, 5);
+
+  // Protection supplémentaire pour s'assurer que recentModules est toujours un array
+  const safeRecentModules = Array.isArray(recentModules) ? recentModules : [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-dark-900 dark:to-dark-800 transition-colors duration-200">
@@ -348,9 +393,9 @@ const AdminDashboard: React.FC = () => {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-gold-400"></div>
               <span className="ml-3 text-gray-600 dark:text-dark-secondary">Chargement des modules...</span>
             </div>
-          ) : recentModules.length > 0 ? (
+          ) : safeRecentModules.length > 0 ? (
             <div className="space-y-4">
-              {recentModules.map((module) => (
+              {safeRecentModules.map((module) => (
                 <div
                   key={module.id}
                   className="flex items-center justify-between p-4 bg-gray-50 dark:bg-dark-600 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-500 transition-colors"

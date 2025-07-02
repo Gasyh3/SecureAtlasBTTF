@@ -1,5 +1,5 @@
 import api from '../services/api';
-import { Module, ModuleCreate, ModuleUpdate, ModulesResponse, ModuleStats, PaginationParams } from '../types/modules';
+import { Module, ModuleCreate, ModuleUpdate, ModuleList, PaginationParams } from '../types/modules';
 
 // Configuration de l'intercepteur pour ajouter le token d'auth
 api.interceptors.request.use(
@@ -22,7 +22,7 @@ export const modulesApi = {
   /**
    * Récupérer la liste des modules avec pagination
    */
-  fetchModules: async (params: PaginationParams = {}): Promise<ModulesResponse> => {
+  fetchModules: async (params: PaginationParams = {}): Promise<ModuleList[]> => {
     const { skip = 0, limit = 10 } = params;
     const response = await api.get('/api/modules/', {
       params: { skip, limit }
@@ -60,18 +60,10 @@ export const modulesApi = {
   deleteModule: async (id: number): Promise<{ message: string }> => {
     const response = await api.delete(`/api/modules/${id}`);
     return response.data;
-  },
-
-  /**
-   * Récupérer les statistiques des modules
-   */
-  getModuleStats: async (): Promise<ModuleStats> => {
-    const response = await api.get('/api/modules/stats/count');
-    return response.data;
   }
 };
 
-// Fonctions individuelles pour une utilisation alternative
+// Fonctions individuelles pour compatibilité
 export const fetchModules = modulesApi.fetchModules;
 export const fetchModule = modulesApi.fetchModule;
 export const getModuleById = modulesApi.fetchModule; // Alias pour QuizPage

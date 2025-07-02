@@ -95,8 +95,7 @@ const QuizTaker: React.FC<QuizComponentProps> = ({ moduleId, onComplete }) => {
       // Filtrer les réponses vides (choice_id = 0)
       const validAnswers = quizState.answers.filter(answer => answer.choice_id !== 0);
       
-      const response = await submitQuiz(moduleId, validAnswers);
-      const result = response.data;
+      const result = await submitQuiz(moduleId, validAnswers);
       
       setQuizState(prev => ({
         ...prev,

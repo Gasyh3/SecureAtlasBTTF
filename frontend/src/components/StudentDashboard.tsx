@@ -20,7 +20,7 @@ const StudentDashboard: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [health, setHealth] = useState<{ status: string } | null>(null);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -37,10 +37,21 @@ const StudentDashboard: React.FC = () => {
         }
 
         if (coursesResponse.status === 'fulfilled') {
-          setCourses(coursesResponse.value.courses);
+          // Vérification de sécurité pour éviter l'erreur undefined.length
+          const coursesData = coursesResponse.value?.courses;
+          if (Array.isArray(coursesData)) {
+            setCourses(coursesData);
+          } else {
+            setCourses([]);
+            console.warn('Courses data is not an array:', coursesData);
+          }
+        } else {
+          setCourses([]);
+          console.error('Failed to fetch courses:', coursesResponse.reason);
         }
       } catch (error) {
         console.error('Erreur chargement dashboard:', error);
+        setCourses([]);
       } finally {
         setLoading(false);
       }
@@ -49,31 +60,96 @@ const StudentDashboard: React.FC = () => {
     fetchData();
   }, []);
 
-  const getDisplayName = () => {
-    if (user?.firstname && user?.lastname) {
-      return `${user.firstname} ${user.lastname}`;
+  // Fonctions sécurisées pour éviter les erreurs undefined
+  const getDisplayName = (): string => {
+    if (!user) return 'Utilisateur';
+    
+    const firstname = user.firstname?.trim() || '';
+    const lastname = user.lastname?.trim() || '';
+    const username = user.username?.trim() || '';
+    const email = user.email?.trim() || '';
+
+    if (firstname && lastname) {
+      return `${firstname} ${lastname}`;
     }
-    if (user?.firstname) {
-      return user.firstname;
+    if (firstname) {
+      return firstname;
     }
-    if (user?.username) {
-      return user.username;
+    if (username) {
+      return username;
     }
-    return user?.email.split('@')[0] || 'Utilisateur';
+    if (email) {
+      const emailPart = email.split('@')[0];
+      return emailPart && emailPart.length > 0 ? emailPart : 'Utilisateur';
+    }
+    
+    return 'Utilisateur';
   };
 
-  const getInitials = () => {
-    if (user?.firstname && user?.lastname) {
-      return `${user.firstname[0]}${user.lastname[0]}`.toUpperCase();
+  const getInitials = (): string => {
+    if (!user) return 'U';
+    
+    const firstname = user.firstname?.trim() || '';
+    const lastname = user.lastname?.trim() || '';
+    const username = user.username?.trim() || '';
+    const email = user.email?.trim() || '';
+
+    if (firstname && lastname) {
+      return `${firstname[0]}${lastname[0]}`.toUpperCase();
     }
-    if (user?.firstname) {
-      return user.firstname[0].toUpperCase();
+    if (firstname) {
+      return firstname[0].toUpperCase();
     }
-    if (user?.username) {
-      return user.username.slice(0, 2).toUpperCase();
+    if (username && username.length >= 2) {
+      return username.slice(0, 2).toUpperCase();
     }
-    return user?.email[0].toUpperCase() || 'U';
+    if (username) {
+      return username[0].toUpperCase();
+    }
+    if (email) {
+      return email[0].toUpperCase();
+    }
+    
+    return 'U';
   };
+
+  // Protection supplémentaire pour s'assurer que courses est toujours un array
+  const safeCourses = Array.isArray(courses) ? courses : [];
+  
+  // Calcul des statistiques de manière sécurisée
+  const stats = {
+    totalCourses: safeCourses.length,
+    progression: 0, // TODO: Calculer la progression réelle
+    certificates: 0, // TODO: Calculer les certificats
+    studyTime: 0 // TODO: Calculer le temps d'étude
+  };
+
+  // Affichage de l'email de manière sécurisée
+  const getUserEmail = (): string => {
+    return user?.email?.trim() || 'email@example.com';
+  };
+
+  const getUserUsername = (): string | null => {
+    const username = user?.username?.trim();
+    return username && username.length > 0 ? username : null;
+  };
+
+  const getUserProfilePicture = (): string | null => {
+    const picture = user?.picture_profile?.trim();
+    return picture && picture.length > 0 ? picture : null;
+  };
+
+  // Si l'utilisateur n'est pas encore chargé, afficher un loader
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-dark-900 dark:to-dark-800 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-gold-400 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-dark-secondary">Chargement du tableau de bord...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-dark-900 dark:to-dark-800 transition-colors duration-200">
@@ -98,7 +174,7 @@ const StudentDashboard: React.FC = () => {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500 dark:text-dark-muted">Cours disponibles</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-dark-primary">{courses.length}</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-dark-primary">{stats.totalCourses}</p>
               </div>
             </div>
           </div>
@@ -110,7 +186,7 @@ const StudentDashboard: React.FC = () => {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500 dark:text-dark-muted">Progression</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-dark-primary">0%</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-dark-primary">{stats.progression}%</p>
               </div>
             </div>
           </div>
@@ -122,7 +198,7 @@ const StudentDashboard: React.FC = () => {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500 dark:text-dark-muted">Certificats</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-dark-primary">0</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-dark-primary">{stats.certificates}</p>
               </div>
             </div>
           </div>
@@ -134,7 +210,7 @@ const StudentDashboard: React.FC = () => {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500 dark:text-dark-muted">Temps d'étude</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-dark-primary">0h</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-dark-primary">{stats.studyTime}h</p>
               </div>
             </div>
           </div>
@@ -150,9 +226,9 @@ const StudentDashboard: React.FC = () => {
             </div>
             <div className="space-y-3">
               <div className="flex justify-center">
-                {user?.picture_profile ? (
+                {getUserProfilePicture() ? (
                   <img
-                    src={user.picture_profile}
+                    src={getUserProfilePicture()!}
                     alt="Profile"
                     className="w-20 h-20 rounded-full object-cover"
                     onError={(e) => {
@@ -161,16 +237,16 @@ const StudentDashboard: React.FC = () => {
                     }}
                   />
                 ) : null}
-                <div className={`w-20 h-20 bg-blue-600 dark:bg-gold-600 rounded-full flex items-center justify-center text-white text-2xl font-bold transition-colors duration-200 ${user?.picture_profile ? 'hidden' : ''}`}>
+                <div className={`w-20 h-20 bg-blue-600 dark:bg-gold-600 rounded-full flex items-center justify-center text-white text-2xl font-bold transition-colors duration-200 ${getUserProfilePicture() ? 'hidden' : ''}`}>
                   {getInitials()}
                 </div>
               </div>
               <div className="text-center">
                 <h3 className="font-semibold text-gray-900 dark:text-dark-primary">{getDisplayName()}</h3>
-                <p className="text-sm text-gray-500 dark:text-dark-muted">{user?.email}</p>
+                <p className="text-sm text-gray-500 dark:text-dark-muted">{getUserEmail()}</p>
                 <p className="text-sm text-blue-600 dark:text-gold-400">Étudiant</p>
-                {user?.username && (
-                  <p className="text-sm text-gray-500 dark:text-dark-muted">@{user.username}</p>
+                {getUserUsername() && (
+                  <p className="text-sm text-gray-500 dark:text-dark-muted">@{getUserUsername()}</p>
                 )}
               </div>
               <button className="w-full flex items-center justify-center space-x-2 bg-gray-100 dark:bg-dark-600 hover:bg-gray-200 dark:hover:bg-dark-500 text-gray-700 dark:text-dark-secondary px-4 py-2 rounded-lg transition-colors">
@@ -188,7 +264,7 @@ const StudentDashboard: React.FC = () => {
             </div>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-gray-700 dark:text-dark-secondary">API Backend:</span>
+                <span className="text-gray-700 dark:text-dark-secondary">Serveur :</span>
                 <StatusIndicator 
                   isHealthy={health !== null} 
                   status={health?.status} 
@@ -250,9 +326,9 @@ const StudentDashboard: React.FC = () => {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-gold-400"></div>
               <span className="ml-3 text-gray-600 dark:text-dark-secondary">Chargement des cours...</span>
             </div>
-          ) : courses.length > 0 ? (
+          ) : safeCourses.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {courses.map((course) => (
+              {safeCourses.map((course) => (
                 <CourseCard key={course.id} course={course} />
               ))}
             </div>

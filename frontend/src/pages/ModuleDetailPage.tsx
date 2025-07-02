@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Edit, Trash2, Loader2, Play, FileText, Calendar, BookOpen } from 'lucide-react';
-import { modulesApi } from '../services/modules';
+import { modulesApi } from '../api/modules';
 import { useAuth } from '../context/AuthContext';
 import type { Module } from '../types/modules';
 

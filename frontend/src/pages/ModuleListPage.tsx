@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
-import { modulesApi } from '../services/modules';
+import { modulesApi } from '../api/modules';
 import ModuleItem from '../components/ModuleItem';
 import { useAuth } from '../context/AuthContext';
 import type { ModuleList } from '../types/modules';

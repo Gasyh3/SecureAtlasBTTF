@@ -3,6 +3,63 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-dark-primary: #111827;
+    --color-dark-800: #1f2937;
+    --color-dark-700: #374151;
+    --color-dark-600: #4b5563;
+    --color-dark-secondary: #9ca3af;
+    --color-dark-muted: #6b7280;
+    --color-gold-400: #fbbf24;
+    --color-gold-500: #f59e0b;
+    --color-gold-600: #d97706;
+    --color-gold-700: #b45309;
+  }
+
+  .dark-primary {
+    color: var(--color-dark-primary);
+  }
+  
+  .dark-secondary {
+    color: var(--color-dark-secondary);
+  }
+  
+  .dark-muted {
+    color: var(--color-dark-muted);
+  }
+  
+  .bg-dark-primary {
+    background-color: var(--color-dark-primary);
+  }
+  
+  .bg-dark-800 {
+    background-color: var(--color-dark-800);
+  }
+  
+  .bg-dark-700 {
+    background-color: var(--color-dark-700);
+  }
+  
+  .bg-dark-600 {
+    background-color: var(--color-dark-600);
+  }
+  
+  .border-dark-600 {
+    border-color: var(--color-dark-600);
+  }
+  
+  .text-dark-primary {
+    color: var(--color-dark-primary);
+  }
+  
+  .text-dark-secondary {
+    color: var(--color-dark-secondary);
+  }
+  
+  .text-dark-muted {
+    color: var(--color-dark-muted);
+  }
+
   html {
     font-family: 'Inter', system-ui, sans-serif;
   }
