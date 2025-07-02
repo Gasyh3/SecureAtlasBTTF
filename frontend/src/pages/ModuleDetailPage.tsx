@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Edit, Trash2, Loader2, Play, FileText, Calendar } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, Loader2, Play, FileText, Calendar, BookOpen } from 'lucide-react';
 import { modulesApi } from '../services/modules';
 import { useAuth } from '../context/AuthContext';
 import type { Module } from '../types/modules';
@@ -50,6 +50,12 @@ const ModuleDetailPage: React.FC = () => {
 
   const handleDelete = () => {
     setShowDeleteModal(true);
+  };
+
+  const handleQuiz = () => {
+    if (module) {
+      navigate(`/modules/${module.id}/quiz`);
+    }
   };
 
   const confirmDelete = async () => {
@@ -267,24 +273,35 @@ const ModuleDetailPage: React.FC = () => {
               </div>
             </div>
 
-            {canModify && (
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleEdit}
-                  className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <Edit className="h-4 w-4" />
-                  Éditer
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 transition-colors"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Supprimer
-                </button>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              {/* Bouton Quiz pour tous les utilisateurs */}
+              <button
+                onClick={handleQuiz}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gold-600 border border-transparent rounded-lg hover:bg-gold-700 transition-colors"
+              >
+                <BookOpen className="h-4 w-4" />
+                Faire le quiz
+              </button>
+
+              {canModify && (
+                <>
+                  <button
+                    onClick={handleEdit}
+                    className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <Edit className="h-4 w-4" />
+                    Éditer
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Supprimer
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>

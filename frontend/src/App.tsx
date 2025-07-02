@@ -9,6 +9,7 @@ import DashboardPage from './pages/DashboardPage';
 import ModuleListPage from './pages/ModuleListPage';
 import ModuleFormPage from './pages/ModuleFormPage';
 import ModuleDetailPage from './pages/ModuleDetailPage';
+import QuizPage from './pages/QuizPage';
 
 function App() {
   return (
@@ -62,6 +63,14 @@ function App() {
                 element={
                   <ProtectedRoute requiredRoles={['instructor', 'admin']}>
                     <ModuleFormPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/modules/:moduleId/quiz" 
+                element={
+                  <ProtectedRoute>
+                    <QuizPage />
                   </ProtectedRoute>
                 } 
               />

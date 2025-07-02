@@ -1,4 +1,5 @@
 import api from '../services/api';
+import { Module, ModuleCreate, ModuleUpdate, ModulesResponse, ModuleStats, PaginationParams } from '../types/modules';
 
 // Configuration de l'intercepteur pour ajouter le token d'auth
 api.interceptors.request.use(
@@ -20,12 +21,8 @@ api.interceptors.request.use(
 export const modulesApi = {
   /**
    * Récupérer la liste des modules avec pagination
-   * @param {Object} params - Paramètres de pagination
-   * @param {number} params.skip - Nombre d'éléments à ignorer
-   * @param {number} params.limit - Nombre maximum d'éléments à retourner
-   * @returns {Promise<Array>} Liste des modules
    */
-  fetchModules: async (params = {}) => {
+  fetchModules: async (params: PaginationParams = {}): Promise<ModulesResponse> => {
     const { skip = 0, limit = 10 } = params;
     const response = await api.get('/api/modules/', {
       params: { skip, limit }
@@ -35,53 +32,40 @@ export const modulesApi = {
 
   /**
    * Récupérer un module par son ID
-   * @param {number} id - ID du module
-   * @returns {Promise<Object>} Module complet
    */
-  fetchModule: async (id) => {
+  fetchModule: async (id: number): Promise<Module> => {
     const response = await api.get(`/api/modules/${id}`);
     return response.data;
   },
 
   /**
    * Créer un nouveau module
-   * @param {Object} data - Données du module
-   * @param {string} data.title - Titre du module
-   * @param {string} data.content - Contenu du module
-   * @param {string} data.type - Type du module ('text' ou 'video')
-   * @returns {Promise<Object>} Module créé
    */
-  createModule: async (data) => {
+  createModule: async (data: ModuleCreate): Promise<Module> => {
     const response = await api.post('/api/modules/', data);
     return response.data;
   },
 
   /**
    * Mettre à jour un module
-   * @param {number} id - ID du module
-   * @param {Object} data - Données à mettre à jour
-   * @returns {Promise<Object>} Module mis à jour
    */
-  updateModule: async (id, data) => {
+  updateModule: async (id: number, data: ModuleUpdate): Promise<Module> => {
     const response = await api.put(`/api/modules/${id}`, data);
     return response.data;
   },
 
   /**
    * Supprimer un module
-   * @param {number} id - ID du module
-   * @returns {Promise<Object>} Message de confirmation
    */
-  deleteModule: async (id) => {
+  deleteModule: async (id: number): Promise<{ message: string }> => {
     const response = await api.delete(`/api/modules/${id}`);
     return response.data;
   },
 
   /**
    * Récupérer les statistiques des modules
-   * @returns {Promise<Object>} Statistiques
    */
-  getModuleStats: async () => {
+  getModuleStats: async (): Promise<ModuleStats> => {
     const response = await api.get('/api/modules/stats/count');
     return response.data;
   }
@@ -90,6 +74,7 @@ export const modulesApi = {
 // Fonctions individuelles pour une utilisation alternative
 export const fetchModules = modulesApi.fetchModules;
 export const fetchModule = modulesApi.fetchModule;
+export const getModuleById = modulesApi.fetchModule; // Alias pour QuizPage
 export const createModule = modulesApi.createModule;
 export const updateModule = modulesApi.updateModule;
 export const deleteModule = modulesApi.deleteModule;
